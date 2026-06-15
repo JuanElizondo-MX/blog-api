@@ -5,6 +5,9 @@ const app = express();
 
 app.use(express.json());
 
+const authorsRouter = require('./routes/authors');
+app.use('/authors', authorsRouter);
+
 app.get('/', (req, res) => {
  res.json({ mensaje: 'API de Blog funcionando' });
 });
