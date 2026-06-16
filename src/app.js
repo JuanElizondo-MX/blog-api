@@ -1,9 +1,15 @@
 const express = require('express');
 require('dotenv').config();
+const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 const app = express();
 
 app.use(express.json());
+
+const swaggerDocument = YAML.load(path.join(__dirname, '..', 'openapi.yaml'));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const authorsRouter = require('./routes/authors');
 app.use('/authors', authorsRouter);
