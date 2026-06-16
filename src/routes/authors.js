@@ -1,47 +1,62 @@
 const express = require('express');
 const router = express.Router();
+const authorsService = require('../services/authorsService');
 
-let authors = [
-    {id: 1, name: 'Sandra Ortiz', email: 'sandra@example.com', bio: 'Desarrolladora full-stack' },
-    {id: 2, name: 'Hugo Sanchez', email: 'hugo@example.com', bio: 'Escritor tecnico' },
-    {id: 3, name: 'Cristal Lopez', email: 'cristal@example.com', bio: 'Ingeniera de sofware' },
-];
-
-router.get('/', (req, res) => {
-  res.status(200).json(authors);
-});
-
-router.get('/:id', (req, res) => {
-  const autor = authors.find(a => a.id === parseInt(req.params.id));
-  if (!autor) return res.status(404).json({ error: 'Autor no encontrado' });
-  res.status(200).json(autor);
-});
-
-router.post('/', (req, res) => {
-  const { name, email, bio } = req.body;
-  if (!name || !email) {
-    return res.status(400).json({ error: 'El nombre y email son obligatorios' });
+router.get('/', async (req, res, next) => {
+  try {
+    const autores = await authorsService.getAllAuthors();
+    res.status(200).json(autores);
+  } catch (err) {
+    console.error('ERROR AUTORES:', err.message);
+    next(err);
   }
-  const nuevoAutor = { id: authors.length + 1, name, email, bio };
-  authors.push(nuevoAutor);
-  res.status(201).json(nuevoAutor);
 });
 
-router.put('/:id', (req, res) => {
-  const autor = authors.find(a => a.id === parseInt(req.params.id));
-  if (!autor) return res.status(404).json({ error: 'Autor no encontrado' });
-  const { name, email, bio } = req.body;
-  if (name) autor.name = name;
-  if (email) autor.email = email;
-  if (bio) autor.bio = bio;
-  res.status(200).json(autor);
+router.get('/:id', async (req, res, next) => {
+  try {
+    const autor = await authorsService.getAuthorById(req.params.id);
+    if (!autor) return res.status(404).json({ error: 'Autor no encontrado' });
+    res.status(200).json(autor);
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.delete('/:id', (req, res) => {
-  const index = authors.findIndex(a => a.id === parseInt(req.params.id));
-  if (index === -1) return res.status(404).json({ error: 'Autor no encontrado' });
-  authors.splice(index, 1);
-  res.status(204).send();
+router.post('/', async (req, res, next) => {
+  try {
+    const { name, email, bio } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'El nombre y email son obligatorios' });
+    }
+    const autor = await authorsService.createAuthor({ name, email, bio });
+    res.status(201).json(autor);
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(400).json({ error: 'Ya existe un autor con ese email' });
+    }
+    next(err);
+  }
+});
+
+router.put('/:id', async (req, res, next) => {
+  try {
+    const { name, email, bio } = req.body;
+    const autor = await authorsService.updateAuthor(req.params.id, { name, email, bio });
+    if (!autor) return res.status(404).json({ error: 'Autor no encontrado' });
+    res.status(200).json(autor);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const eliminado = await authorsService.deleteAuthor(req.params.id);
+    if (!eliminado) return res.status(404).json({ error: 'Autor no encontrado' });
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;
