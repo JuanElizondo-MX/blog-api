@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authorsService = require('../services/authorsService');
+const { validateAuthorCreate } = require('../middlewares/validators');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -22,12 +23,10 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', validateAuthorCreate, async (req, res, next) => {
   try {
     const { name, email, bio } = req.body;
-    if (!name || !email) {
-      return res.status(400).json({ error: 'El nombre y email son obligatorios' });
-    }
+
     const autor = await authorsService.createAuthor({ name, email, bio });
     res.status(201).json(autor);
   } catch (err) {

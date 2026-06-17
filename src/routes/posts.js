@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const postsService = require('../services/postsService');
+const { validatePostCreate } = require('../middlewares/validators');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -30,12 +31,10 @@ router.get('/author/:authorId', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', validatePostCreate, async (req, res, next) => {
   try {
     const { title, content, author_id, published } = req.body;
-    if (!title || !content || !author_id) {
-      return res.status(400).json({ error: 'El titulo, contenido y autor son obligatorios' });
-    }
+    
     const post = await postsService.createPost({ title, content, author_id, published });
     res.status(201).json(post);
   } catch (err) {
