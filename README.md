@@ -24,8 +24,8 @@ Un author puede tener varios posts.
 
 1. Clona el repo:
 ```bash
-git clone https://github.com/TU-USUARIO/blog-api.git
-cd blog-api
+   git clone https://github.com/JuanElizondo-MX/miniblog-api.git
+   cd miniblog-api
 ```
 
 2. Instala las dependencias:
@@ -56,6 +56,18 @@ npm run dev
 ```
 
 Te deja en http://localhost:3000
+
+### Variables de entorno
+
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| PORT | Puerto del servidor | 3000 |
+| PGHOST | Host de PostgreSQL | localhost |
+| PGPORT | Puerto de PostgreSQL | 5432 |
+| PGUSER | Usuario de PostgreSQL | postgres |
+| PGPASSWORD | Contraseña de PostgreSQL | tu_contraseña |
+| PGDATABASE | Nombre de la base de datos | blog_api |
+| DATABASE_URL | URL de conexión completa (usada en Railway) | postgresql://usuario:contraseña@host:puerto/db |
 
 ## Los endpoints
 
