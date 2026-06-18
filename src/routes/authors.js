@@ -39,7 +39,18 @@ router.post('/', validateAuthorCreate, async (req, res, next) => {
 
 router.put('/:id', async (req, res, next) => {
   try {
-    const { name, email, bio } = req.body;
+    const { name, email, bio } = req.body || {};
+
+    const existente = await authorsService.getAuthorById(req.params.id);
+    if (!existente) return res.status(404).json({ error: 'Autor no encontrado' });
+
+    if (email) {
+      const dueno = await authorsService.getAuthorByEmail(email);
+      if (dueno && String(dueno.id) !== String(req.params.id)) {
+        return res.status(400).json({ error: 'Ya existe un autor con ese email' });
+      }
+    }
+
     const autor = await authorsService.updateAuthor(req.params.id, { name, email, bio });
     if (!autor) return res.status(404).json({ error: 'Autor no encontrado' });
     res.status(200).json(autor);

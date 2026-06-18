@@ -44,7 +44,7 @@ router.post('/', validatePostCreate, async (req, res, next) => {
 
 router.put('/:id', async (req, res, next) => {
   try {
-    const { title, content, published } = req.body;
+    const { title, content, published } = req.body || {};
     const post = await postsService.updatePost(req.params.id, { title, content, published });
     if (!post) return res.status(404).json({ error: 'Post no encontrado' });
     res.status(200).json(post);
